@@ -10,6 +10,15 @@
 #define BLOCK_SIZE 4096
 
 int main() {
+    // 用户 read
+    // 系统调用 sys_read
+    // vfs-ext4,denty, struct file{ inode }
+    // inode: address_space
+    // address_space: page
+    // page: index
+    // bio, request_queue, IO 调度器
+    // DMA
+    // SSD
     int fd = open("/tmp/testfile", O_RDONLY);
     if (fd < 0) { perror("open"); exit(1); }
 
