@@ -56,6 +56,7 @@ int main() {
 }
 
 /*
+gcc -o io_uring_read io_uring_read.c
 strace -c ./io_uring_read
 
 % time     seconds  usecs/call     calls    errors syscall

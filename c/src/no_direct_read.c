@@ -33,3 +33,7 @@ int main() {
     free(buf);
     return 0;
 }
+/*
+gcc -o no_direct_read no_direct_read.c
+
+*/

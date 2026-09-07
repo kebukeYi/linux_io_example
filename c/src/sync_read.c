@@ -20,6 +20,7 @@ int main() {
 }
 
 /*
+gcc -o sync_read sync_read.c
 strace -c ./sync_read
 % time     seconds  usecs/call     calls    errors syscall
 ------ ----------- ----------- --------- --------- ----------------
