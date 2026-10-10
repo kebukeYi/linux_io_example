@@ -11,7 +11,7 @@
 
 int main() {
     // 用户 read
-    // 系统调用 sys_read
+    // 系统调用 ksys_read
     // vfs-ext4,denty, struct file{ inode }
     // inode: address_space
     // address_space: page

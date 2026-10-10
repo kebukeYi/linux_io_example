@@ -1,31 +1,38 @@
-#include <stdio.h>
 #include <fcntl.h>
-#include <string.h>
-#include <stdlib.h>
-#include <unistd.h>
 #include <liburing.h>
-#define BLOCK_SIZE 4096   // 请确保定义
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+
+#define BLOCK_SIZE 4096  // 请确保定义
 #define QUEUE_DEPTH 32
 #define NUM_BLOCKS 1024
 
 int main() {
     struct io_uring ring;
-    struct io_uring_sqe *sqe;
-    struct io_uring_cqe *cqe;
+    struct io_uring_sqe* sqe;
+    struct io_uring_cqe* cqe;
     int fd = open("/tmp/testfile", O_RDONLY);
-    if (fd < 0) { perror("open"); exit(1); }
+    if (fd < 0) {
+        perror("open");
+        exit(1);
+    }
 
-    char *buf;
-    if (posix_memalign((void **)&buf, 4096, BLOCK_SIZE * NUM_BLOCKS) != 0) {
-        perror("posix_memalign"); exit(1);
+    char* buf;
+    if (posix_memalign((void**)&buf, 4096, BLOCK_SIZE * NUM_BLOCKS) != 0) {
+        perror("posix_memalign");
+        exit(1);
     }
 
     if (io_uring_queue_init(QUEUE_DEPTH, &ring, 0) != 0) {
-        fprintf(stderr, "io_uring_queue_init failed\n"); exit(1);
+        fprintf(stderr, "io_uring_queue_init failed\n");
+        exit(1);
     }
 
     struct iovec iovs[NUM_BLOCKS];
     int submitted = 0;
+    
     while (submitted < NUM_BLOCKS) {
         sqe = io_uring_get_sqe(&ring);
         if (!sqe) {
@@ -35,15 +42,19 @@ int main() {
         iovs[submitted].iov_base = buf + submitted * BLOCK_SIZE;
         iovs[submitted].iov_len = BLOCK_SIZE;
         io_uring_prep_readv(sqe, fd, &iovs[submitted], 1, submitted * BLOCK_SIZE);
-        io_uring_sqe_set_data(sqe, (void *)(long)submitted);
+        io_uring_sqe_set_data(sqe, (void*)(long)submitted);
         submitted++;
     }
+
     io_uring_submit(&ring);
 
     int completed = 0;
     while (completed < NUM_BLOCKS) {
         int ret = io_uring_wait_cqe(&ring, &cqe);
-        if (ret < 0) { fprintf(stderr, "wait_cqe: %s\n", strerror(-ret)); exit(1); }
+        if (ret < 0) {
+            fprintf(stderr, "wait_cqe: %s\n", strerror(-ret));
+            exit(1);
+        }
         // 处理完成，可获取 cqe->res 检查读取字节数
         io_uring_cqe_seen(&ring, cqe);
         completed++;

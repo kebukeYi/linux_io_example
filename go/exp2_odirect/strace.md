@@ -8,7 +8,6 @@
 
 ```
 
-
 ```
 strace -c -f -e trace=write,pwrite64,fsync,fdatasync,openat ./exp2 -stage=A
 
